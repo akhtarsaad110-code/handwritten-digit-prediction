@@ -27,6 +27,13 @@ st.markdown("""
         text-align: center;
         margin-bottom: 30px;
     }
+    .stButton>button {
+        width: 100%;
+        background-color: #4B6BFF;
+        color: white;
+        border-radius: 8px;
+        font-weight: bold;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -51,7 +58,7 @@ with st.sidebar:
     st.markdown("### 🎯 Accuracy Note")
     st.write("Is model ki accuracy aam taur par **98% se 99%** hoti hai!")
 
-# Tabs for Upload vs Draw (Yeh pehle define hona zaroori hai)
+# Tabs for Upload vs Draw
 tab1, tab2 = st.tabs(["✍️ Draw Digit on Canvas", "📤 Upload Image"])
 
 with tab1:
@@ -59,7 +66,7 @@ with tab1:
     # Create a canvas component
     canvas_result = st_canvas(
         fill_color="black",
-        stroke_width=15,
+        stroke_width=20,
         stroke_color="white",
         background_color="black",
         width=280,
@@ -68,11 +75,11 @@ with tab1:
         key="canvas",
     )
     
-    # Safe check for canvas image data
-    if canvas_result is not None and canvas_result.image_data is not None:
-        try:
+    # Predict Button to safely trigger canvas processing
+    if st.button("Predict Digit"):
+        if canvas_result is not None and canvas_result.image_data is not None:
             img_data = canvas_result.image_data
-            if img_data.size > 0 and np.any(img_data > 0):
+            if img_data.size > 0:
                 img_data_uint8 = img_data.astype('uint8')
                 img = Image.fromarray(img_data_uint8).convert('L')
                 
@@ -88,8 +95,8 @@ with tab1:
                 st.success(f"### Predicted Digit: **{pred_idx}**")
                 st.metric(label="Confidence Score", value=f"{confidence:.2f}%")
                 st.progress(int(confidence))
-        except Exception as e:
-            st.info("Kripya canvas par kuch draw karein prediction ke liye.")
+        else:
+            st.warning("Pehle canvas par koi digit draw karein!")
 
 with tab2:
     st.markdown("### Upload Digit Image")
