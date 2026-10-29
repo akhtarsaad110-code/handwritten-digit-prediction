@@ -2,7 +2,6 @@ import streamlit as st
 import numpy as np
 import tensorflow as tf
 from PIL import Image
-from streamlit_drawable_canvas import st_canvas
 
 # Page Configuration
 st.set_page_config(
@@ -39,9 +38,9 @@ st.markdown("""
 
 # Header Section
 st.markdown('<p class="main-header">🔢 Handwritten Digit Recognition</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-header">Interactive CNN Digit Recognizer with Drawing Canvas</p>', unsafe_allow_html=True)
+st.markdown('<p class="sub-header">Deep Learning CNN Model Powered by TensorFlow & Streamlit</p>', unsafe_allow_html=True)
 
-# Load Model directly from local directory
+# Load Model directly from local directory (mnist_model.h5)
 @st.cache_resource
 def load_model():
     model_path = 'mnist_model.h5'
@@ -53,73 +52,43 @@ with st.spinner("Loading AI model... Please wait."):
 # Sidebar Info
 with st.sidebar:
     st.title("📊 Project Dashboard")
-    st.info("Aap canvas par number likh kar 'Predict Digit' ka button dabayein, model foran pehchan lega!")
+    st.info("Yeh application 0 se 9 tak ke handwritten digits ko 99% accuracy ke sath pehchanti hai!")
     st.markdown("---")
-    st.markdown("### 🎯 Accuracy Note")
-    st.write("Model ki accuracy **98% - 99%** tak hai!")
+    st.markdown("### 🎯 Model Info")
+    st.write("- **Architecture:** Convolutional Neural Network (CNN)")
+    st.write("- **Dataset:** MNIST")
+    st.write("- **Accuracy:** ~99%")
 
-# Tabs for Canvas vs Upload
-tab1, tab2 = st.tabs(["✍️ Draw Digit on Canvas", "📤 Upload Image"])
+# Main Layout
+col1, col2 = st.columns(2, gap="large")
 
-with tab1:
-    st.markdown("### Mouse ya Touch se Niche Number (0-9) Likhein:")
-    
-    # Canvas setup with unique key to prevent crashes
-    canvas_result = st_canvas(
-        fill_color="black",
-        stroke_width=20,
-        stroke_color="white",
-        background_color="black",
-        width=280,
-        height=280,
-        drawing_mode="freedraw",
-        key="canvas_digit",
-    )
-    
-    # Predict button to safely process canvas data on demand
-    if st.button("🔮 Predict Digit"):
-        if canvas_result is not None and canvas_result.image_data is not None:
-            # Extract image array from canvas
-            img_data = canvas_result.image_data
-            
-            # Convert to grayscale PIL image
-            img_data_uint8 = img_data.astype('uint8')
-            img = Image.fromarray(img_data_uint8).convert('L')
-            
-            # Resize to 28x28 for MNIST model input
-            processed_img = img.resize((28, 28))
-            img_array = np.array(processed_img) / 255.0
-            img_array = img_array.reshape(1, 28, 28, 1)
-            
-            # Make prediction
-            preds = model.predict(img_array)
-            pred_idx = np.argmax(preds[0])
-            confidence = float(np.max(preds[0])) * 100
-            
-            # Display results
-            st.markdown("---")
-            st.success(f"### Predicted Digit: **{pred_idx}**")
-            st.metric(label="Confidence Score", value=f"{confidence:.2f}%")
-            st.progress(int(confidence))
-        else:
-            st.warning("Pehle canvas par koi digit draw karein!")
-
-with tab2:
-    st.markdown("### Upload Digit Image")
-    uploaded_file = st.file_uploader("Choose a digit image (0-9)...", type=["png", "jpg", "jpeg"])
+with col1:
+    st.markdown("### 📤 Upload Digit Image")
+    st.markdown("Kisi bhi white paper par pen se 0 se 9 tak koi number likh kar uski tasveer yahan upload karein:")
+    uploaded_file = st.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"])
     
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
-        st.image(image, caption="Uploaded Digit Image", width=250)
+        st.image(image, caption="Uploaded Digit Image", width=280)
+
+with col2:
+    st.markdown("### 🔍 Prediction & Analytics")
+    if uploaded_file is not None:
+        with st.spinner("Analyzing digit..."):
+            processed_img = image.convert('L').resize((28, 28))
+            img_array = np.array(processed_img) / 255.0
+            img_array = img_array.reshape(1, 28, 28, 1)
+            
+            preds = model.predict(img_array)
+            pred_idx = np.argmax(preds[0])
+            confidence = float(np.max(preds[0])) * 100
         
-        processed_img = image.convert('L').resize((28, 28))
-        img_array = np.array(processed_img) / 255.0
-        img_array = img_array.reshape(1, 28, 28, 1)
-        
-        preds = model.predict(img_array)
-        pred_idx = np.argmax(preds[0])
-        confidence = float(np.max(preds[0])) * 100
-        
+        # Display Results
         st.success(f"### Predicted Digit: **{pred_idx}**")
         st.metric(label="Confidence Score", value=f"{confidence:.2f}%")
         st.progress(int(confidence))
+        
+        st.markdown("---")
+        st.info("💡 **Tip:** Behtareen result ke liye saaf background aur dark pen ka istemal karein!")
+    else:
+        st.info("👈 Please left panel mein digit ki tasveer upload karein.")
