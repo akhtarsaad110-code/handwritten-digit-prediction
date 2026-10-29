@@ -42,16 +42,10 @@ st.markdown("""
 st.markdown('<p class="main-header">🔢 Handwritten Digit Recognition</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-header">Deep Learning CNN Model Powered by Streamlit</p>', unsafe_allow_html=True)
 
-# Load Model from Google Drive automatically if not present
-# Load Model from Google Drive automatically if not present
+# Load Model directly from local directory
 @st.cache_resource
 def load_model():
     model_path = 'mnist_model.h5'
-    if not os.path.exists(model_path):
-        url = 'https://drive.google.com/uc?id=1CH3YpFBXj9XNaVuu9tM5FRTE4TwTXOu4'
-        with st.spinner("Downloading MNIST AI model from cloud storage... Please wait."):
-            gdown.download(url, model_path, quiet=False)
-            
     return tf.keras.models.load_model(model_path)
 
 with st.spinner("Loading AI model... Please wait."):
