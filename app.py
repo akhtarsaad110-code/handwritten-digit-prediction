@@ -2,6 +2,8 @@ import streamlit as st
 import numpy as np
 import tensorflow as tf
 from PIL import Image
+import os
+import gdown
 
 # Page Configuration
 st.set_page_config(
@@ -40,10 +42,17 @@ st.markdown("""
 st.markdown('<p class="main-header">🔢 Handwritten Digit Recognition</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-header">Deep Learning CNN Model Powered by Streamlit</p>', unsafe_allow_html=True)
 
-# Load Model
+# Load Model from Google Drive automatically if not present
 @st.cache_resource
 def load_model():
-    return tf.keras.models.load_model('mnist_model.h5')
+    model_path = 'mnist_model.h5'
+    if not os.path.exists(model_path):
+        # Aapke Google Drive link ka direct download URL
+        url = 'https://drive.google.com/uc?id=1CH3YpFBXj9XNaVuu9tM5FRTE4TwTXOu4'
+        with st.spinner("Downloading MNIST AI model from cloud storage... Please wait."):
+            gdown.download(url, model_path, fuzzy=True, quiet=False)
+            
+    return tf.keras.models.load_model(model_path)
 
 with st.spinner("Loading AI model... Please wait."):
     model = load_model()
@@ -51,7 +60,7 @@ with st.spinner("Loading AI model... Please wait."):
 # Sidebar Info
 with st.sidebar:
     st.title("📊 Project Dashboard")
-    st.info(" Yeh application 0 se 9 tak ke numbers ko pehchanti hai joConvolutional Neural Network (CNN) par mabni hai.")
+    st.info("Yeh application 0 se 9 tak ke numbers ko pehchanti hai jo Convolutional Neural Network (CNN) par mabni hai.")
     st.markdown("---")
     st.markdown("### 🎯 Accuracy Note")
     st.write("Is dataset ki accuracy aam taur par **98% se 99%** tak hoti hai!")
@@ -73,9 +82,6 @@ with col2:
         with st.spinner("Analyzing digit..."):
             processed_img = image.convert('L').resize((28, 28))
             img_array = np.array(processed_img) / 255.0
-            
-            # Agar background white aur digit black ho, to invert karne ki zaroorat par sakti hai
-            # Lekin standard images ke liye direct reshape:
             img_array = img_array.reshape(1, 28, 28, 1)
             
             preds = model.predict(img_array)
