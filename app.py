@@ -52,19 +52,20 @@ with st.spinner("Loading AI model... Please wait."):
 # Sidebar Info
 with st.sidebar:
     st.title("📊 Project Dashboard")
-    st.info("Yeh application 0 se 9 tak ke handwritten digits ko 99% accuracy ke sath pehchanti hai!")
+    st.info("This application predicts handwritten digits (0 to 9) with high accuracy using a Convolutional Neural Network (CNN).")
     st.markdown("---")
-    st.markdown("### 🎯 Model Info")
+    st.markdown("### 🎯 Model Overview")
     st.write("- **Architecture:** Convolutional Neural Network (CNN)")
-    st.write("- **Dataset:** MNIST")
-    st.write("- **Accuracy:** ~99%")
+    st.write("- **Dataset:** MNIST Dataset")
+    st.write("- **Target Accuracy:** ~99%")
+    st.write("- **Framework:** TensorFlow / Keras")
 
 # Main Layout
 col1, col2 = st.columns(2, gap="large")
 
 with col1:
     st.markdown("### 📤 Upload Digit Image")
-    st.markdown("Kisi bhi white paper par pen se 0 se 9 tak koi number likh kar uski tasveer yahan upload karein:")
+    st.markdown("Please upload a clear image of a handwritten digit (0-9):")
     uploaded_file = st.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"])
     
     if uploaded_file is not None:
@@ -89,6 +90,6 @@ with col2:
         st.progress(int(confidence))
         
         st.markdown("---")
-        st.info("💡 **Tip:** Behtareen result ke liye saaf background aur dark pen ka istemal karein!")
+        st.info("💡 **Tip:** For best accuracy, use dark writing on a clean white background.")
     else:
-        st.info("👈 Please left panel mein digit ki tasveer upload karein.")
+        st.info("👈 Please upload a digit image from the left panel to see predictions.")
